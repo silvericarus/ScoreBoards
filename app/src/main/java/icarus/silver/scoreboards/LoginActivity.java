@@ -62,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
                                     user = usuariologeado.getIdUsuario();
                                     queue.stop();
 
-                                    //TODO Crear nueva página que será el dashboard principal del usuario
                                     Intent intent = new Intent(LoginActivity.this,UsuarioActivity.class);
                                     intent.putExtra("user",user);
                                     startActivity(intent);
