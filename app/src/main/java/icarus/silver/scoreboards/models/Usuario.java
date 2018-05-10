@@ -9,11 +9,11 @@ public class Usuario {
     String descripcion;
     String rol;
     int nivel;
-    boolean amonestado;
+    int amonestado;
 
     private Context context;
 
-    public Usuario(long idUsuario, String nick, String fotodeperfil, String descripcion, String rol, int nivel, boolean amonestado) {
+    public Usuario(long idUsuario, String nick, String fotodeperfil, String descripcion, String rol, int nivel, int amonestado) {
         this.idUsuario = idUsuario;
         this.nick = nick;
         this.fotodeperfil = fotodeperfil;
@@ -78,11 +78,11 @@ public class Usuario {
         this.nivel = nivel;
     }
 
-    public boolean isAmonestado() {
+    public int isAmonestado() {
         return amonestado;
     }
 
-    public void setAmonestado(boolean amonestado) {
+    public void setAmonestado(int amonestado) {
         this.amonestado = amonestado;
     }
 }

@@ -1,8 +1,10 @@
 package icarus.silver.scoreboards;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -44,6 +46,8 @@ public class UsuarioActivity extends AppCompatActivity {
     private TextView descripcion;
     private TextView nivel;
     private ImageView userimage;
+    private ImageView logoUsuario;
+    private CardView userCardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +76,8 @@ public class UsuarioActivity extends AppCompatActivity {
         descripcion = (TextView)findViewById(R.id.descripcion);
         nivel = (TextView)findViewById(R.id.nivel);
         userimage = (ImageView)findViewById(R.id.userimage);
+        logoUsuario = (ImageView)findViewById(R.id.logo_usuario);
+        userCardView = (CardView)findViewById(R.id.userCardView);
 
         queue = Volley.newRequestQueue(UsuarioActivity.this);
         queue.start();
@@ -97,7 +103,7 @@ public class UsuarioActivity extends AppCompatActivity {
                         try {
 
                             usuarioActual = gson.fromJson(response.getJSONObject(0).toString(),Usuario.class);
-                            rellenarUsuario(nick,descripcion,nivel,userimage);
+                            rellenarUsuario(nick,descripcion,nivel,userimage,logoUsuario);
 
                         } catch (JSONException e) {
                             Toast.makeText(UsuarioActivity.this,"Se ha producido un error al obtener el usuario",Toast.LENGTH_LONG).show();
@@ -114,13 +120,26 @@ public class UsuarioActivity extends AppCompatActivity {
         queue.add(jsonArrayRequest);
     }
 
-    public void rellenarUsuario(TextView nick,TextView descripcion,TextView nivel,ImageView userimage){
+    public void rellenarUsuario(TextView nick,TextView descripcion,TextView nivel,ImageView userimage,ImageView logoUsuario){
         nick.setText(usuarioActual.getNick());
         Log.i("nick",""+usuarioActual.getNick());
         descripcion.setText(usuarioActual.getDescripcion());
         nivel.setText(Integer.toString(usuarioActual.getNivel()));
         //Ponemos la imagen de perfil con Picasso
         Picasso.with(UsuarioActivity.this).load(usuarioActual.getFotodeperfil()).into(userimage);
+
+        if(usuarioActual.isAmonestado()==1){
+            logoUsuario.setImageDrawable(getDrawable(R.drawable.ic_warning_red_24dp));
+            userCardView.setCardBackgroundColor(Color.rgb(244,67,54));
+        }else{
+            if(usuarioActual.getRol().equalsIgnoreCase("moderador")){
+                logoUsuario.setImageDrawable(getDrawable(R.drawable.ic_security_orange_24dp));
+            }else if(usuarioActual.getRol().equalsIgnoreCase("administrador")){
+                logoUsuario.setImageDrawable(getDrawable(R.drawable.ic_grade_orange_24dp));
+            }else{
+                logoUsuario.setImageDrawable(getDrawable(R.drawable.ic_videogame_asset_black_24dp));
+            }
+        }
     }
 
     public void rellenarJuegos(){
