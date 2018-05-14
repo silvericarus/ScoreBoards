@@ -12,7 +12,7 @@ public class Juego implements Serializable {
     private int rebaja;
     private String imagen;
 
-    private Context context;
+    private transient Context context;
 
     public Juego(int idJuego, String nombre, float precio, int rebaja, String imagen) {
         this.idJuego = idJuego;
