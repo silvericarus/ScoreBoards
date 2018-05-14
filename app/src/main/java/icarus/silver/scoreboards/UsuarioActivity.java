@@ -65,9 +65,9 @@ public class UsuarioActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final Juego juegoSelected = mJuegoAdapter.getItemList().get(mJuegoList.getChildAdapterPosition(v));
-                //Intent intent1 = new Intent(UsuarioActivity.this,JuegoActivity.class);
-                //intent1.putExtra("juego",juegoSelected);
-                //startActivity(intent1);
+                Intent intent1 = new Intent(UsuarioActivity.this,JuegoActivity.class);
+                intent1.putExtra("juego",juegoSelected);
+                startActivity(intent1);
             }
         });
 
