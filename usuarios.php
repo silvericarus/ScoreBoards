@@ -5,7 +5,6 @@ function Conectar($host,$user,$pass,$dbname)
 {
    $conexion=mysqli_connect($host,$user,$pass) or die("ERROR CONEXION");
    mysqli_select_db($conexion,$dbname) or die("ERROR CONEXION");
-   
    return $conexion;
 }
 
@@ -59,9 +58,9 @@ $conexion=Conectar($host,$user,$pass,$dbname);
           echo $json;
     	break;
 		
-		case "logros":
+		case "listarlogros":
 		  $juego=$_GET["juego"];
-          $query="SELECT * FROM logro WHERE idJuego = '$juego'";
+          $query="SELECT idLogro,nombre,apiname,imagen,imagengrey FROM logro WHERE idJuego = '$juego'";
           $resultado=mysqli_query($conexion,$query) or die("ERROR");
           $json=TABLA_A_JSON($resultado);
           echo $json;

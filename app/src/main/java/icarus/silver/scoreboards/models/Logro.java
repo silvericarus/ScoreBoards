@@ -6,32 +6,26 @@ import com.google.gson.annotations.Expose;
 
 public class Logro {
 
-    @Expose
     private int idLogro;
 
-    @Expose
     private String nombre;
 
-    @Expose
+    private String apiname;
+
     private String imagen;
 
-    @Expose
     private String imagengrey;
 
-    @Expose
-    private String descripcion;
-
-    @Expose
     private int idJuego;
 
     public transient Context context;
 
-    public Logro(int idLogro, String nombre, String imagen, String imagengrey, String descripcion, int idJuego) {
+    public Logro(int idLogro, String nombre, String apiname, String imagen, String imagengrey, int idJuego) {
         this.idLogro = idLogro;
         this.nombre = nombre;
+        this.apiname = apiname;
         this.imagen = imagen;
         this.imagengrey = imagengrey;
-        this.descripcion = descripcion;
         this.idJuego = idJuego;
     }
 
@@ -82,13 +76,6 @@ public class Logro {
         this.imagengrey = imagengrey;
     }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
 
     public int getIdJuego() {
         return idJuego;
@@ -96,5 +83,13 @@ public class Logro {
 
     public void setIdJuego(int idJuego) {
         this.idJuego = idJuego;
+    }
+
+    public String getApiname() {
+        return apiname;
+    }
+
+    public void setApiname(String apiname) {
+        this.apiname = apiname;
     }
 }
