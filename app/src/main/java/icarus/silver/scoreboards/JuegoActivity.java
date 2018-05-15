@@ -72,6 +72,7 @@ public class JuegoActivity extends AppCompatActivity {
                 final Logro logroSelected = logrosAdapter.getItemList().get(logros_rv.getChildAdapterPosition(v));
                 ToolTip toolTip = new ToolTip.Builder()
                         .withText(logroSelected.getNombre())
+                        .withTextSize(40)
                         .withBackgroundColor(getResources().getColor(R.color.colorAccent))
                         .withCornerRadius(10)
                         .build();
@@ -84,13 +85,21 @@ public class JuegoActivity extends AppCompatActivity {
             }
         });
 
+        logrosAdapter.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //TODO lanzar LogroActivity con foro de Logro
+                return false;
+            }
+        });
+
         cargarLogros();
 
     }
 
     private void cargarLogros() {
-        String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=getlogros&juego="+juego.getIdJuego();
-        Log.i("juego", juego.getNombre());
+        String url = String.format("http://10.0.2.2/MINI_apijson/usuarios.php?accion=listarlogros&juego=%s", String.valueOf(juego.getIdJuego()));
+        Log.i("peticion",url);
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                 (Request.Method.GET,url,null , new Response.Listener<JSONArray>() {
