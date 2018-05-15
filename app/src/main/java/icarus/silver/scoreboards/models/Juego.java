@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class Juego implements Serializable {
 
-    private int idJuego;
+    private long idJuego;
     private String nombre;
     private float precio;
     private int rebaja;
@@ -29,11 +29,11 @@ public class Juego implements Serializable {
     public Juego() {
     }
 
-    public int getIdJuego() {
+    public long getIdJuego() {
         return idJuego;
     }
 
-    public void setIdJuego(int idJuego) {
+    public void setIdJuego(long idJuego) {
         this.idJuego = idJuego;
     }
 
