@@ -1,5 +1,6 @@
 package icarus.silver.scoreboards;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.xizzhu.simpletooltip.ToolTip;
 import com.github.xizzhu.simpletooltip.ToolTipView;
@@ -27,13 +29,18 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import icarus.silver.scoreboards.adapters.LogroAdapter;
+import icarus.silver.scoreboards.models.Achievement;
 import icarus.silver.scoreboards.models.Juego;
 import icarus.silver.scoreboards.models.Logro;
 import icarus.silver.scoreboards.models.LogroContextInstanceCreator;
+import icarus.silver.scoreboards.models.LogrosDesbloqueados;
+import icarus.silver.scoreboards.models.LogrosDesbloqueadosContextInstanceCreator;
 
 public class JuegoActivity extends AppCompatActivity {
 
@@ -42,13 +49,20 @@ public class JuegoActivity extends AppCompatActivity {
     private RecyclerView logros_rv;
     private LogroAdapter logrosAdapter;
     public ArrayList<Logro> logroList = new ArrayList<Logro>();
+    public LogrosDesbloqueados logrosDesbloqueados;
     public Juego juego;
+    public long user;
     private RequestQueue queue;
+    public Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_juego);
+
+        context = JuegoActivity.this;
+
+        logrosDesbloqueados = new LogrosDesbloqueados();
 
         header_juego = (ImageView)findViewById(R.id.header_juego);
         titulo_juego = (TextView)findViewById(R.id.titulo_juego);
@@ -56,6 +70,7 @@ public class JuegoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         juego = (Juego) intent.getSerializableExtra("juego");
+        user = intent.getLongExtra("user",0);
 
         Picasso.with(JuegoActivity.this).load(juego.getImagen()).into(header_juego);
         titulo_juego.setText(juego.getNombre());
@@ -63,7 +78,9 @@ public class JuegoActivity extends AppCompatActivity {
         queue = Volley.newRequestQueue(JuegoActivity.this);
         queue.start();
 
-        logrosAdapter = new LogroAdapter(logroList);
+
+
+        logrosAdapter = new LogroAdapter(logroList,JuegoActivity.this);
         logros_rv.setAdapter(logrosAdapter);
         logros_rv.setLayoutManager(new GridLayoutManager(this,3));
         logrosAdapter.setOnClickListener(new View.OnClickListener() {
@@ -93,8 +110,48 @@ public class JuegoActivity extends AppCompatActivity {
             }
         });
 
+        getLogrosDesbloqueados();
+
         cargarLogros();
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        queue = Volley.newRequestQueue(JuegoActivity.this);
+        queue.start();
+
+        if(logrosDesbloqueados != null) {
+            getLogrosDesbloqueados();
+        }
+    }
+
+    private void getLogrosDesbloqueados() {
+        String url = String.format("https://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=%s&key=2A6FAD639070E553F1A2B93C7CD57488&steamid=%s", juego.getIdJuego(),user);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        gsonBuilder.registerTypeAdapter(
+                                LogrosDesbloqueados.class,
+                                new LogrosDesbloqueadosContextInstanceCreator(JuegoActivity.this));
+                        Gson gson = gsonBuilder.create();
+                        logrosDesbloqueados = gson.fromJson(response.toString(),LogrosDesbloqueados.class);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("VolleyError",error.getMessage());
+                    }
+                });
+        queue.add(jsonObjectRequest);
+    }
+
+    public List<Achievement> getAchievements(){
+        return logrosDesbloqueados.getPlayerstats().getAchievements();
     }
 
     private void cargarLogros() {
