@@ -1,5 +1,7 @@
 package icarus.silver.scoreboards.adapters;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,17 +13,22 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import icarus.silver.scoreboards.JuegoActivity;
 import icarus.silver.scoreboards.R;
+import icarus.silver.scoreboards.models.Achievement;
 import icarus.silver.scoreboards.models.Logro;
 
 public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHolder> implements View.OnClickListener,View.OnLongClickListener {
     private ArrayList<Logro> itemList;
     private View.OnClickListener mListener;
     private View.OnLongClickListener mLongListener;
+    private Context context;
 
 
-    public LogroAdapter(ArrayList<Logro> itemList) {
+
+    public LogroAdapter(ArrayList<Logro> itemList,Context context) {
         this.itemList = itemList;
+        this.context = context;
     }
 
     public ArrayList<Logro> getItemList() {
@@ -45,7 +52,7 @@ public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHol
 
         view.setOnClickListener(mListener);
 
-        LogroViewHolder viewHolder = new LogroViewHolder(view);
+        LogroViewHolder viewHolder = new LogroViewHolder(view,context);
 
         return viewHolder;
     }
@@ -83,22 +90,45 @@ public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHol
         }
     }
 
+
     public class LogroViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView logo_logro;
+        private Context mContext;
 
 
-        public LogroViewHolder(View itemView) {
+        public LogroViewHolder(View itemView,Context mContext) {
 
             super(itemView);
 
             logo_logro = (ImageView)   itemView.findViewById(R.id.logo_logro);
+
+            this.mContext = mContext;
         }
 
         public void bindQuoteItem(Logro item) {
-            Log.i("imagen", item.getImagengrey());
-            Picasso.with(item.getContext()).load(item.getImagengrey()).into(logo_logro);
+            int contador=0;
+            try {
+                for (Achievement achievement : ((JuegoActivity) mContext).logrosDesbloqueados.getPlayerstats().getAchievements()) {
+                    Log.d("logroDesbloqueado",achievement.getName());
+                    if (item.getApiname().equals(achievement.getName())) {
+                        Log.d("coincidencia",achievement.getName()+""+item.getApiname());
+                        Picasso.with(item.getContext()).load(item.getImagen()).into(logo_logro);
+                        contador++;
+                        break;
+                    } else {
+                        if(contador < 2) {
+                            Log.d("coincidencia", "No coincidencia en logro "+item.getApiname());
+                            Picasso.with(item.getContext()).load(item.getImagengrey()).into(logo_logro);
+                        }else{
+                            break;
+                        }
+                    }
+                }
+            }catch(NullPointerException ex){
+                    Picasso.with(item.getContext()).load(item.getImagengrey()).into(logo_logro);
+            }
         }
     }
-
 }
+

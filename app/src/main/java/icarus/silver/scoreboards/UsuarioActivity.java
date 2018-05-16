@@ -67,6 +67,7 @@ public class UsuarioActivity extends AppCompatActivity {
                 final Juego juegoSelected = mJuegoAdapter.getItemList().get(mJuegoList.getChildAdapterPosition(v));
                 Intent intent1 = new Intent(UsuarioActivity.this,JuegoActivity.class);
                 intent1.putExtra("juego",juegoSelected);
+                intent1.putExtra("user",user);
                 startActivity(intent1);
             }
         });
