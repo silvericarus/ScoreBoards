@@ -117,7 +117,7 @@ public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHol
                         contador++;
                         break;
                     } else {
-                        if(contador < 2) {
+                        if(contador < 6) {
                             Log.d("coincidencia", "No coincidencia en logro "+item.getApiname());
                             Picasso.with(item.getContext()).load(item.getImagengrey()).into(logo_logro);
                         }else{

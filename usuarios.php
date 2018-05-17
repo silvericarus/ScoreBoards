@@ -3,7 +3,9 @@ header('Content-Type: application/json; charset=utf-8');
 
 function Conectar($host,$user,$pass,$dbname)
 {
+	
    $conexion=mysqli_connect($host,$user,$pass) or die("ERROR CONEXION");
+   mysqli_set_charset($conexion,'utf-8');
    mysqli_select_db($conexion,$dbname) or die("ERROR CONEXION");
    return $conexion;
 }
@@ -29,7 +31,7 @@ $conexion=Conectar($host,$user,$pass,$dbname);
    switch($opcion)
    {
     	case "consulta":
-          $query="SELECT * FROM usuario";
+          $query="SELECT idLogro,nombre,apiname,imagen,imagengrey FROM logro WHERE idJuego = 730";
           $resultado=mysqli_query($conexion,$query) or die("ERROR");
           $json=TABLA_A_JSON($resultado);
           echo $json;
@@ -52,7 +54,7 @@ $conexion=Conectar($host,$user,$pass,$dbname);
 		
 		case "selectjuegoscompradospor":
 		  $user=$_GET["user"];
-          $query="SELECT * FROM juego WHERE idJuego =(SELECT idJuego FROM posee WHERE idUsuario = '$user')";
+          $query="SELECT * FROM juego WHERE idJuego IN(SELECT idJuego FROM posee WHERE idUsuario = '$user')";
           $resultado=mysqli_query($conexion,$query) or die("ERROR");
           $json=TABLA_A_JSON($resultado);
           echo $json;

@@ -80,6 +80,8 @@ public class JuegoActivity extends AppCompatActivity {
 
 
 
+        getLogrosDesbloqueados();
+
         logrosAdapter = new LogroAdapter(logroList,JuegoActivity.this);
         logros_rv.setAdapter(logrosAdapter);
         logros_rv.setLayoutManager(new GridLayoutManager(this,3));
@@ -110,22 +112,8 @@ public class JuegoActivity extends AppCompatActivity {
             }
         });
 
-        getLogrosDesbloqueados();
-
         cargarLogros();
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        queue = Volley.newRequestQueue(JuegoActivity.this);
-        queue.start();
-
-        if(logrosDesbloqueados != null) {
-            getLogrosDesbloqueados();
-        }
     }
 
     private void getLogrosDesbloqueados() {
