@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".UsuarioActivity" />
-        <activity android:name=".JuegoActivity"></activity>
+        <activity android:name=".JuegoActivity" />
+        <activity android:name=".LogroActivity"></activity>
     </application>
 
 </manifest>

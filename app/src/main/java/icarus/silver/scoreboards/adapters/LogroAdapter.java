@@ -52,6 +52,8 @@ public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHol
 
         view.setOnClickListener(mListener);
 
+        view.setOnLongClickListener(mLongListener);
+
         LogroViewHolder viewHolder = new LogroViewHolder(view,context);
 
         return viewHolder;
