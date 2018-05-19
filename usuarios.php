@@ -62,7 +62,7 @@ $conexion=Conectar($host,$user,$pass,$dbname);
 		
 		case "listarlogros":
 		  $juego=$_GET["juego"];
-          $query="SELECT idLogro,nombre,apiname,imagen,imagengrey FROM logro WHERE idJuego = '$juego'";
+          $query="SELECT idLogro,nombre,apiname,descripcion,imagen,imagengrey FROM logro WHERE idJuego = '$juego'";
           $resultado=mysqli_query($conexion,$query) or die("ERROR");
           $json=TABLA_A_JSON($resultado);
           echo $json;

@@ -107,7 +107,12 @@ public class JuegoActivity extends AppCompatActivity {
         logrosAdapter.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //TODO lanzar LogroActivity con foro de Logro
+                final Logro logroSelected = logrosAdapter.getItemList().get(logros_rv.getChildAdapterPosition(v));
+
+                Intent intent1 = new Intent(JuegoActivity.this,LogroActivity.class);
+                intent1.putExtra("logro",logroSelected);
+                intent1.putExtra("user",user);
+                startActivity(intent1);
                 return false;
             }
         });

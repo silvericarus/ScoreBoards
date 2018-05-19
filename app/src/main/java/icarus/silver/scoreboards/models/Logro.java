@@ -4,13 +4,17 @@ import android.content.Context;
 
 import com.google.gson.annotations.Expose;
 
-public class Logro {
+import java.io.Serializable;
+
+public class Logro implements Serializable{
 
     private int idLogro;
 
     private String nombre;
 
     private String apiname;
+
+    private String descripcion;
 
     private String imagen;
 
@@ -20,10 +24,11 @@ public class Logro {
 
     public transient Context context;
 
-    public Logro(int idLogro, String nombre, String apiname, String imagen, String imagengrey, int idJuego) {
+    public Logro(int idLogro, String nombre, String apiname, String descripcion, String imagen, String imagengrey, int idJuego) {
         this.idLogro = idLogro;
         this.nombre = nombre;
         this.apiname = apiname;
+        this.descripcion = descripcion;
         this.imagen = imagen;
         this.imagengrey = imagengrey;
         this.idJuego = idJuego;
@@ -76,7 +81,6 @@ public class Logro {
         this.imagengrey = imagengrey;
     }
 
-
     public int getIdJuego() {
         return idJuego;
     }
@@ -91,5 +95,13 @@ public class Logro {
 
     public void setApiname(String apiname) {
         this.apiname = apiname;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 }
