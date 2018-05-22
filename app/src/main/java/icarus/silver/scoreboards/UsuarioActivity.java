@@ -57,6 +57,7 @@ public class UsuarioActivity extends AppCompatActivity {
         Intent intent = getIntent();
         user = intent.getLongExtra("user",0);
 
+
         mJuegoList = (RecyclerView)findViewById(R.id.listaJuegos);
         mJuegoAdapter = new JuegoAdapter(juegoList);
         mJuegoList.setLayoutManager(new LinearLayoutManager(UsuarioActivity.this));
@@ -84,8 +85,12 @@ public class UsuarioActivity extends AppCompatActivity {
         queue.start();
 
         traerUsuario(user);
-        rellenarJuegos();
 
+        Log.i("infomode",String.valueOf(intent.getBooleanExtra("infomode",false)));
+
+        if(!intent.getBooleanExtra("infomode",false)){
+            rellenarJuegos();
+        }
     }
 
     public void traerUsuario(long user){
