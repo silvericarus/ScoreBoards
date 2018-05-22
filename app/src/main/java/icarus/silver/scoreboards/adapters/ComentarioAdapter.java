@@ -22,9 +22,9 @@ import icarus.silver.scoreboards.models.Achievement;
 import icarus.silver.scoreboards.models.Comentario;
 import icarus.silver.scoreboards.models.Logro;
 
-public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.ComentarioViewHolder> implements CheckableImageButton.OnClickListener{
+public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.ComentarioViewHolder> implements View.OnClickListener{
     private ArrayList<Comentario> itemList;
-    private CheckableImageButton.OnClickListener mListener;
+    private View.OnClickListener mListener;
     private Context context;
 
 
@@ -70,7 +70,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
         return itemList.size();
     }
 
-    public void setOnClickListener(CheckableImageButton.OnClickListener listener){
+    public void setOnClickListener(View.OnClickListener listener){
         this.mListener = listener;
     }
 
@@ -84,7 +84,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
     public class ComentarioViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView icono_usuario;
+        private ImageButton icono_usuario;
         private TextView contenido;
         private CheckableImageButton upvote_btn;
         private CheckableImageButton downvote_btn;
@@ -96,7 +96,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
             super(itemView);
 
-            icono_usuario = (ImageView)itemView.findViewById(R.id.icono_usuario);
+            icono_usuario = (ImageButton)itemView.findViewById(R.id.icono_usuario);
             contenido = (TextView)itemView.findViewById(R.id.contenido_comentario);
             upvote_btn = (CheckableImageButton)itemView.findViewById(R.id.boton_upvote);
             downvote_btn = (CheckableImageButton)itemView.findViewById(R.id.boton_downvote);
@@ -111,6 +111,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             contenido.setText(item.getContenido());
             upvote_btn.setOnClickListener(ComentarioAdapter.this);
             downvote_btn.setOnClickListener(ComentarioAdapter.this);
+            icono_usuario.setOnClickListener(ComentarioAdapter.this);
             puntuacion_comentario.setText((String.valueOf(item.getPuntuacion())));
             if(Integer.parseInt(puntuacion_comentario.getText().toString())<0){
                 puntuacion_comentario.setTextColor(Color.RED);

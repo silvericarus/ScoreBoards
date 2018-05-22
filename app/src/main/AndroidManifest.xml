@@ -18,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".UsuarioActivity" />
+        <activity android:name=".UsuarioActivity"
+            android:launchMode="singleTop">
+        </activity>
         <activity android:name=".JuegoActivity" />
         <activity android:name=".LogroActivity"></activity>
     </application>
