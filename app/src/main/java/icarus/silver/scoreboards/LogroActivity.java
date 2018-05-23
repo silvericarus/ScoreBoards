@@ -3,16 +3,19 @@ package icarus.silver.scoreboards;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,19 +28,15 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.dunst.check.CheckableImageButton;
-import com.github.xizzhu.simpletooltip.ToolTip;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 
 import icarus.silver.scoreboards.adapters.ComentarioAdapter;
@@ -113,6 +112,89 @@ public class LogroActivity extends AppCompatActivity implements Comparator<Comen
         traerUsuario(user);
         traerComentarios();
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.logro_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.crear_comentario:
+                crearComentario();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void crearComentario() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(LogroActivity.this);
+
+        LayoutInflater inflater = LogroActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.dialogo_crear_comentario, null);
+
+        builder.setView(v);
+
+        Button aceptar = (Button) v.findViewById(R.id.aceptar_comentario);
+        Button cancelar = (Button) v.findViewById(R.id.cancelar_comentario);
+        final EditText contenido = (EditText) v.findViewById(R.id.contenido_coment);
+        final String[] contenido_comen = new String[1];
+
+
+        final AlertDialog alert = builder.create();
+
+        aceptar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contenido_comen[0] = contenido.getText().toString();
+                llamarApiCrearComentario(contenido_comen[0],user,logro.getIdLogro());
+                alert.dismiss();
+            }
+        });
+
+        cancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alert.dismiss();
+            }
+        });
+
+
+        alert.show();
+    }
+
+    private void llamarApiCrearComentario(String contenido_coment, long user, int idLogro) {
+        Log.i("contenidodespues",contenido_coment);
+        String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=crearcomentario&user="+user+"&logro="+idLogro+"&contenido="+contenido_coment;
+        Log.i("apiComentario",url);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if(response.get("estado").equals(true)){
+                        Toast.makeText(LogroActivity.this,"Comentario creado con éxito", Toast.LENGTH_SHORT).show();
+                        traerComentarios();
+                    }else{
+                        Toast.makeText(LogroActivity.this,"Ha ocurrido un error al crear el comentario", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("VolleyError",error.getMessage());
+            }
+        });
+        queue.add(jsonObjectRequest);
     }
 
     private void dialogousuario(final Comentario comentarioSelected) {
@@ -253,6 +335,9 @@ public class LogroActivity extends AppCompatActivity implements Comparator<Comen
     }
 
     private void traerComentarios() {
+        if(comentarios.size() > 0){
+            comentarios.clear();
+        }
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=selectcomentarios&logro="+logro.getIdLogro();
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                 (Request.Method.GET,url,null , new Response.Listener<JSONArray>() {
@@ -274,8 +359,8 @@ public class LogroActivity extends AppCompatActivity implements Comparator<Comen
                                 }
                             }
                             for(String s:listdata){
-                                Comentario juego = gson.fromJson(s,Comentario.class);
-                                comentarioAdapter.addItemToItemList(juego);
+                                Comentario comentario = gson.fromJson(s,Comentario.class);
+                                comentarioAdapter.addItemToItemList(comentario);
                                 actualizarLista();
                             }
 

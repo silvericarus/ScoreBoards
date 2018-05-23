@@ -36,7 +36,7 @@
                 app:srcCompat="@mipmap/ic_launcher_round" />
 
             <TextView
-                android:id="@+id/contenido_comentario"
+                android:id="@+id/contenido_coment"
                 android:layout_width="143dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
