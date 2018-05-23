@@ -38,7 +38,7 @@ $conexion=Conectar($host,$user,$pass,$dbname);
     	break;
 		
 		case "loginusuario":
-          $query="SELECT * FROM usuario";
+          $query="SELECT * FROM usuario where nick='RetroBlack'";
           $resultado=mysqli_query($conexion,$query) or die("ERROR");
           $json=TABLA_A_JSON($resultado);
           echo $json;
@@ -67,6 +67,30 @@ $conexion=Conectar($host,$user,$pass,$dbname);
           $json=TABLA_A_JSON($resultado);
           echo $json;
     	break;
+		
+		case "selectcomentarios":
+			$logro=$_GET["logro"];
+			$query="SELECT c.idComentario,c.contenido,c.puntuacion,u.fotodeperfil,c.idUsuario FROM comentario c,usuario u WHERE c.idUsuario = u.idUsuario AND c.idLogro = '$logro'";
+			$resultado=mysqli_query($conexion,$query) or die("ERROR");
+			$json=TABLA_A_JSON($resultado);
+			echo $json;
+    	break;
+		
+		case "amonestar":
+           $user=$_GET["user"];
+           $query="UPDATE usuario SET amonestado=1 WHERE idUsuario='$user';";
+           mysqli_query($conexion,$query) or die("ERROR");
+           echo '{"estado":true}';
+      break;
+	  
+	  case "crearcomentario":
+           $user=$_GET["user"];
+		   $logro=$_GET["logro"];
+		   $contenido=$_GET["contenido"];
+           $query="INSERT INTO comentario (idComentario,contenido,puntuacion,idLogro,idUsuario) values (NULL,'$contenido',0,'$logro','$user');";
+           mysqli_query($conexion,$query) or die("ERROR");
+           echo '{"estado":true}';
+      break;
       
       case "insertar":
            $user=$_GET["user"];

@@ -3,12 +3,10 @@ package icarus.silver.scoreboards.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dunst.check.CheckableImageButton;
@@ -16,11 +14,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import icarus.silver.scoreboards.JuegoActivity;
 import icarus.silver.scoreboards.R;
-import icarus.silver.scoreboards.models.Achievement;
 import icarus.silver.scoreboards.models.Comentario;
-import icarus.silver.scoreboards.models.Logro;
 
 public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.ComentarioViewHolder> implements View.OnClickListener{
     private ArrayList<Comentario> itemList;
@@ -97,7 +92,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             super(itemView);
 
             icono_usuario = (ImageButton)itemView.findViewById(R.id.icono_usuario);
-            contenido = (TextView)itemView.findViewById(R.id.contenido_comentario);
+            contenido = (TextView)itemView.findViewById(R.id.contenido_coment);
             upvote_btn = (CheckableImageButton)itemView.findViewById(R.id.boton_upvote);
             downvote_btn = (CheckableImageButton)itemView.findViewById(R.id.boton_downvote);
             puntuacion_comentario = (TextView)itemView.findViewById(R.id.puntuación_comentario);

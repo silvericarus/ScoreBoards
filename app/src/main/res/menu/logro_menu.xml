@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/crear_comentario"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="Crear comentario"
+        android:visible="true"
+        app:showAsAction="always" />
+</menu>
