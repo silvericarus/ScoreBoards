@@ -52,6 +52,7 @@ public class JuegoActivity extends AppCompatActivity {
     public LogrosDesbloqueados logrosDesbloqueados;
     public Juego juego;
     public long user;
+    public boolean logrosDesbloqueadosCargados = false;
     private RequestQueue queue;
     public Context context;
 
@@ -64,6 +65,7 @@ public class JuegoActivity extends AppCompatActivity {
 
         logrosDesbloqueados = new LogrosDesbloqueados();
 
+
         header_juego = (ImageView)findViewById(R.id.header_juego);
         titulo_juego = (TextView)findViewById(R.id.titulo_juego);
         logros_rv = (RecyclerView)findViewById(R.id.logros_rv);
@@ -72,15 +74,16 @@ public class JuegoActivity extends AppCompatActivity {
         juego = (Juego) intent.getSerializableExtra("juego");
         user = intent.getLongExtra("user",0);
 
+
         Picasso.with(JuegoActivity.this).load(juego.getImagen()).into(header_juego);
         titulo_juego.setText(juego.getNombre());
 
         queue = Volley.newRequestQueue(JuegoActivity.this);
         queue.start();
-
-
-
         getLogrosDesbloqueados();
+
+
+
 
         logrosAdapter = new LogroAdapter(logroList,JuegoActivity.this);
         logros_rv.setAdapter(logrosAdapter);
@@ -116,8 +119,12 @@ public class JuegoActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        cargarLogros();
+        if(logrosDesbloqueadosCargados) {
+            cargarLogros();
+        }else{
+            getLogrosDesbloqueados();
+            cargarLogros();
+        }
 
     }
 
@@ -133,6 +140,7 @@ public class JuegoActivity extends AppCompatActivity {
                                 new LogrosDesbloqueadosContextInstanceCreator(JuegoActivity.this));
                         Gson gson = gsonBuilder.create();
                         logrosDesbloqueados = gson.fromJson(response.toString(),LogrosDesbloqueados.class);
+                        logrosDesbloqueadosCargados = true;
                     }
                 }, new Response.ErrorListener() {
                     @Override
