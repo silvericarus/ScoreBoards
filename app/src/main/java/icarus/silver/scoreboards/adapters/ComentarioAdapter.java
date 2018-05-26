@@ -50,6 +50,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
         view.setOnClickListener(mListener);
 
+
         ComentarioViewHolder viewHolder = new ComentarioViewHolder(view,context);
 
         return viewHolder;
@@ -75,6 +76,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             mListener.onClick(v);
         }
     }
+
 
 
     public class ComentarioViewHolder extends RecyclerView.ViewHolder {
