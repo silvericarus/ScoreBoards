@@ -46,7 +46,7 @@ import icarus.silver.scoreboards.models.Logro;
 import icarus.silver.scoreboards.models.UserContextInstanceCreator;
 import icarus.silver.scoreboards.models.Usuario;
 
-public class LogroActivity extends AppCompatActivity implements Comparator<Comentario>{
+public class LogroActivity extends AppCompatActivity{
 
     public long user;
     public Logro logro;
@@ -330,7 +330,6 @@ public class LogroActivity extends AppCompatActivity implements Comparator<Comen
     }
 
     public void actualizarLista(){
-        comentarios.sort(LogroActivity.this);
         comentarioAdapter.notifyDataSetChanged();
     }
 
@@ -379,14 +378,4 @@ public class LogroActivity extends AppCompatActivity implements Comparator<Comen
         queue.add(jsonArrayRequest);
     }
 
-    @Override
-    public int compare(Comentario o1, Comentario o2) {
-        if (o1.getPuntuacion() < o2.getPuntuacion()){
-            return 1;
-        }
-        if (o1.getPuntuacion() > o2.getPuntuacion()){
-            return -1;
-        }
-        return 0;
-    }
 }
