@@ -38,7 +38,7 @@ $conexion=Conectar($host,$user,$pass,$dbname);
     	break;
 		
 		case "loginusuario":
-          $query="SELECT * FROM usuario where nick='RetroBlack'";
+          $query="SELECT * FROM usuario where nick='silver_icarus'";
           $resultado=mysqli_query($conexion,$query) or die("ERROR");
           $json=TABLA_A_JSON($resultado);
           echo $json;
@@ -70,15 +70,56 @@ $conexion=Conectar($host,$user,$pass,$dbname);
 		
 		case "selectcomentarios":
 			$logro=$_GET["logro"];
-			$query="SELECT c.idComentario,c.contenido,c.puntuacion,u.fotodeperfil,c.idUsuario FROM comentario c,usuario u WHERE c.idUsuario = u.idUsuario AND c.idLogro = '$logro'";
+			$query="SELECT c.idComentario,c.contenido,c.puntuacion,u.fotodeperfil,u.vecesAmonestado,c.idUsuario FROM comentario c,usuario u WHERE c.idUsuario = u.idUsuario AND c.idLogro = '$logro'";
 			$resultado=mysqli_query($conexion,$query) or die("ERROR");
 			$json=TABLA_A_JSON($resultado);
 			echo $json;
     	break;
 		
-		case "amonestar":
+	  case "amonestar":
            $user=$_GET["user"];
-           $query="UPDATE usuario SET amonestado=1 WHERE idUsuario='$user';";
+           $query="UPDATE usuario SET vecesAmonestado=vecesAmonestado+1 WHERE idUsuario='$user';";
+           mysqli_query($conexion,$query) or die("ERROR");
+		   $query="UPDATE usuario SET amonestado=1 WHERE idUsuario='$user';";
+		   mysqli_query($conexion,$query) or die("ERROR");
+           echo '{"estado":true}';
+      break;
+	  
+	  case "darexp":
+           $user=$_GET["user"];
+		   $exp=$_GET["exp"];
+           $query="UPDATE usuario SET nivel=nivel+'$exp' WHERE idUsuario='$user';";
+           mysqli_query($conexion,$query) or die("ERROR");
+           echo '{"estado":true}';
+      break;
+	  
+	  	  case "quitarexp":
+           $user=$_GET["user"];
+		   $exp=$_GET["exp"];
+           $query="UPDATE usuario SET nivel=nivel-'$exp' WHERE idUsuario='$user';";
+           mysqli_query($conexion,$query) or die("ERROR");
+           echo '{"estado":true}';
+      break;
+	  
+	  case "setLogrosDesbloqueados":
+           $user=$_GET["user"];
+		   $logrosDesbloqueados=$_GET["logrosDesbloqueados"];
+           $query="UPDATE usuario SET logrosDesbloqueados=logrosDesbloqueados+'$logrosDesbloqueados' WHERE idUsuario='$user';";
+           mysqli_query($conexion,$query) or die("ERROR");
+           echo '{"estado":true}';
+      break;
+	  
+	  case "upvote":
+           $comentario=$_GET["comentario"];
+           $query="UPDATE comentario SET puntuacion=puntuacion+1 WHERE idComentario='$comentario';";
+           mysqli_query($conexion,$query) or die("ERROR");
+           echo '{"estado":true}';
+      break;
+	  
+	  	  case "downvote":
+           $comentario=$_GET["comentario"];
+		   $usuario=$_GET["usuario"];
+           $query="UPDATE comentario SET puntuacion=puntuacion-1 WHERE idComentario='$comentario';";
            mysqli_query($conexion,$query) or die("ERROR");
            echo '{"estado":true}';
       break;

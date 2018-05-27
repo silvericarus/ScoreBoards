@@ -10,10 +10,12 @@ public class Usuario {
     String rol;
     int nivel;
     int amonestado;
+    int logrosDesbloqueados;
+    int vecesAmonestado;
 
     private Context context;
 
-    public Usuario(long idUsuario, String nick, String fotodeperfil, String descripcion, String rol, int nivel, int amonestado) {
+    public Usuario(long idUsuario, String nick, String fotodeperfil, String descripcion, String rol, int nivel, int amonestado, int logrosDesbloqueados, int vecesAmonestado) {
         this.idUsuario = idUsuario;
         this.nick = nick;
         this.fotodeperfil = fotodeperfil;
@@ -21,6 +23,8 @@ public class Usuario {
         this.rol = rol;
         this.nivel = nivel;
         this.amonestado = amonestado;
+        this.logrosDesbloqueados = logrosDesbloqueados;
+        this.vecesAmonestado = vecesAmonestado;
     }
 
     public Usuario() {
@@ -84,5 +88,25 @@ public class Usuario {
 
     public void setAmonestado(int amonestado) {
         this.amonestado = amonestado;
+    }
+
+    public int getAmonestado() {
+        return amonestado;
+    }
+
+    public int getLogrosDesbloqueados() {
+        return logrosDesbloqueados;
+    }
+
+    public void setLogrosDesbloqueados(int logrosDesbloqueados) {
+        this.logrosDesbloqueados = logrosDesbloqueados;
+    }
+
+    public int getVecesAmonestado() {
+        return vecesAmonestado;
+    }
+
+    public void setVecesAmonestado(int vecesAmonestado) {
+        this.vecesAmonestado = vecesAmonestado;
     }
 }

@@ -37,7 +37,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import icarus.silver.scoreboards.adapters.ComentarioAdapter;
 import icarus.silver.scoreboards.models.Comentario;
@@ -180,6 +179,7 @@ public class LogroActivity extends AppCompatActivity{
                 try {
                     if(response.get("estado").equals(true)){
                         Toast.makeText(LogroActivity.this,"Comentario creado con éxito", Toast.LENGTH_SHORT).show();
+                        darExp(String.valueOf(usuario.getIdUsuario()),20);
                         traerComentarios();
                     }else{
                         Toast.makeText(LogroActivity.this,"Ha ocurrido un error al crear el comentario", Toast.LENGTH_SHORT).show();
@@ -203,7 +203,7 @@ public class LogroActivity extends AppCompatActivity{
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(getResources().getStringArray(R.array.acciones_usuario)[which]){
-                    case "Ver información": info_usuario();
+                    case "Ver información": info_usuario(comentarioSelected.getIdUsuario());
                     dialog.dismiss();
                     break;
 
@@ -224,14 +224,18 @@ public class LogroActivity extends AppCompatActivity{
         alert.show();
     }
 
-    private void info_usuario() {
+    private void info_usuario(String usuarioComentarioSelected) {
         Intent intent = new Intent(LogroActivity.this,UsuarioActivity.class);
-        intent.putExtra("user",user);
+        intent.putExtra("user",Long.valueOf(usuarioComentarioSelected));
         intent.putExtra("infomode",true);
         startActivity(intent);
     }
 
     private void amonestar(Comentario comentarioSelected) {
+        quitarExpDeAmonestar(comentarioSelected);
+        amonestarUsuario(comentarioSelected);
+    }
+    private void amonestarUsuario(Comentario comentarioSelected){
         if(usuario.getRol().equals("moderador")||usuario.getRol().equals("administrador")){
             String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=amonestar&user="+comentarioSelected.getIdUsuario();
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
@@ -254,28 +258,134 @@ public class LogroActivity extends AppCompatActivity{
                 }
             });
             queue.add(jsonObjectRequest);
+
         }else{
             Toast.makeText(LogroActivity.this,"No tienes permisos para hacer esto", Toast.LENGTH_SHORT).show();
         }
+    }
+    private void quitarExpDeAmonestar(Comentario comentario){
+        if(comentario.getVecesAmonestado()==0){
+            quitarExp(comentario.getIdUsuario(),15);
+        }else if(comentario.getVecesAmonestado()==1){
+            quitarExp(comentario.getIdUsuario(),30);
+        }else if(comentario.getVecesAmonestado()>=2){
+            quitarExp(comentario.getIdUsuario(),35);
+        }
+    }
+
+    private void quitarExp(final String idUsuario, final int exp) {
+        String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=quitarexp&user="+idUsuario+"&exp="+exp;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if(response.get("estado").equals(true)){
+                        Log.i("EXPsystem",exp+"retirados a"+usuario);
+                    }else{
+                        Log.i("EXPsystem","Algo salió mal");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("VolleyError",error.getMessage());
+            }
+        });
+        queue.add(jsonObjectRequest);
     }
 
     private void upvote(View v,Comentario comentario) {
         if(comentario.getIdUsuario().equals(String.valueOf(user))){
             Toast.makeText(LogroActivity.this,"No puedes votar tus mismos comentarios",Toast.LENGTH_SHORT).show();
         }else {
-            if (!((CheckableImageButton) v).isChecked()) {
-                if(comentarios.get(comentarios.lastIndexOf(comentario)).getPuntuacion()!=comentario.getPuntuacion()) {
-                    ((CheckableImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24dp));
-                }
-                comentario.setPuntuacion(comentario.getPuntuacion() -1);
+            if ((((CheckableImageButton) v).isChecked())) {
+                ((CheckableImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_orange_24dp));
+                upvoteDB(comentario);
+                darExp(comentario.getIdUsuario(),20);
+                darExp(String.valueOf(usuario.getIdUsuario()),25);
+                comentario.setPuntuacion(comentario.getPuntuacion()+1);
             } else {
-                if(comentarios.get(comentarios.lastIndexOf(comentario)).getPuntuacion()!=comentario.getPuntuacion()) {
-                    ((CheckableImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_orange_24dp));
-                }
-                comentario.setPuntuacion(comentario.getPuntuacion() + 1);
+                ((CheckableImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24dp));
+                downvoteDB(comentario);
+                comentario.setPuntuacion(comentario.getPuntuacion()-1);
             }
             actualizarLista();
         }
+    }
+
+    private void upvoteDB(Comentario comentario) {
+        String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=upvote&comentario="+comentario.getIdComentario()+"&usuario="+comentario.getIdUsuario();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if(response.get("estado").equals(true)){
+                        Log.i("vote","upvote registrado en DB");
+                    }else{
+                        Log.i("vote","Algo salió mal");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("VolleyError",error.getMessage());
+            }
+        });
+        queue.add(jsonObjectRequest);
+    }
+
+    private void downvoteDB(Comentario comentario) {
+        String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=downvote&comentario="+comentario.getIdComentario()+"&usuario="+comentario.getIdUsuario();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if(response.get("estado").equals(true)){
+                        Log.i("vote","downvote registrado en DB");
+                    }else{
+                        Log.i("vote","Algo salió mal");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("VolleyError",error.getMessage());
+            }
+        });
+        queue.add(jsonObjectRequest);
+    }
+
+    private void darExp(final String idUsuario, final int exp){
+        String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=darexp&user="+idUsuario+"&exp="+exp;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if(response.get("estado").equals(true)){
+                        Log.i("EXPsystem",exp+"otorgados a"+idUsuario);
+                    }else{
+                        Log.i("EXPsystem","Algo salió mal");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("VolleyError",error.getMessage());
+            }
+        });
+        queue.add(jsonObjectRequest);
     }
 
     public void traerUsuario(long user){
@@ -314,16 +424,16 @@ public class LogroActivity extends AppCompatActivity{
         if(comentario.getIdUsuario().equals(String.valueOf(user))){
             Toast.makeText(LogroActivity.this,"No puedes votar tus mismos comentarios",Toast.LENGTH_SHORT).show();
         }else{
-            if(!((CheckableImageButton)v).isChecked()){
-                if(comentarios.get(comentarios.lastIndexOf(comentario)).getPuntuacion()!=comentario.getPuntuacion()) {
-                    ((CheckableImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24dp));
-                }
-                comentario.setPuntuacion(comentario.getPuntuacion()+1);
-            }else{
-                if(comentarios.get(comentarios.lastIndexOf(comentario)).getPuntuacion()!=comentario.getPuntuacion()) {
-                    ((CheckableImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_orange_24dp));
-                }
+            if((((CheckableImageButton)v).isChecked())){
+                ((CheckableImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_orange_24dp));
+                downvoteDB(comentario);
+                quitarExp(comentario.getIdUsuario(),20);
+                darExp(String.valueOf(usuario.getIdUsuario()),25);
                 comentario.setPuntuacion(comentario.getPuntuacion()-1);
+            }else{
+                ((CheckableImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24dp));
+                upvoteDB(comentario);
+                comentario.setPuntuacion(comentario.getPuntuacion()+1);
             }
             actualizarLista();
         }

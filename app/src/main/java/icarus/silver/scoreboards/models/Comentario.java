@@ -14,17 +14,20 @@ public class Comentario{
 
     private String idUsuario;
 
+    private int vecesAmonestado;
+
     private Context context;
 
     public Comentario() {
     }
 
-    public Comentario(int idComentario, String contenido, int puntuacion, String fotodeperfil, String idUsuario) {
+    public Comentario(int idComentario, String contenido, int puntuacion, String fotodeperfil, String idUsuario, int vecesAmonestado) {
         this.idComentario = idComentario;
         this.contenido = contenido;
         this.puntuacion = puntuacion;
         this.fotodeperfil = fotodeperfil;
         this.idUsuario = idUsuario;
+        this.vecesAmonestado = vecesAmonestado;
     }
 
     public Comentario(Context context) {
@@ -77,5 +80,13 @@ public class Comentario{
 
     public void setContext(Context context) {
         this.context = context;
+    }
+
+    public int getVecesAmonestado() {
+        return vecesAmonestado;
+    }
+
+    public void setVecesAmonestado(int vecesAmonestado) {
+        this.vecesAmonestado = vecesAmonestado;
     }
 }

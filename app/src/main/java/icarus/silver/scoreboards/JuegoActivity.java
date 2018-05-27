@@ -41,18 +41,21 @@ import icarus.silver.scoreboards.models.Logro;
 import icarus.silver.scoreboards.models.LogroContextInstanceCreator;
 import icarus.silver.scoreboards.models.LogrosDesbloqueados;
 import icarus.silver.scoreboards.models.LogrosDesbloqueadosContextInstanceCreator;
+import icarus.silver.scoreboards.models.UserContextInstanceCreator;
+import icarus.silver.scoreboards.models.Usuario;
+
+import static java.lang.Thread.sleep;
 
 public class JuegoActivity extends AppCompatActivity {
 
     private ImageView header_juego;
     private TextView titulo_juego;
-    private RecyclerView logros_rv;
-    private LogroAdapter logrosAdapter;
+    public RecyclerView logros_rv;
+    public LogroAdapter logrosAdapter;
     public ArrayList<Logro> logroList = new ArrayList<Logro>();
     public LogrosDesbloqueados logrosDesbloqueados;
     public Juego juego;
     public long user;
-    public boolean logrosDesbloqueadosCargados = false;
     private RequestQueue queue;
     public Context context;
 
@@ -62,9 +65,6 @@ public class JuegoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_juego);
 
         context = JuegoActivity.this;
-
-        logrosDesbloqueados = new LogrosDesbloqueados();
-
 
         header_juego = (ImageView)findViewById(R.id.header_juego);
         titulo_juego = (TextView)findViewById(R.id.titulo_juego);
@@ -88,6 +88,7 @@ public class JuegoActivity extends AppCompatActivity {
         logrosAdapter = new LogroAdapter(logroList,JuegoActivity.this);
         logros_rv.setAdapter(logrosAdapter);
         logros_rv.setLayoutManager(new GridLayoutManager(this,3));
+
         logrosAdapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,16 +120,10 @@ public class JuegoActivity extends AppCompatActivity {
                 return false;
             }
         });
-        if(logrosDesbloqueadosCargados) {
-            cargarLogros();
-        }else{
-            getLogrosDesbloqueados();
-            cargarLogros();
-        }
 
     }
 
-    private void getLogrosDesbloqueados() {
+    public void getLogrosDesbloqueados() {
         String url = String.format("https://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=%s&key=2A6FAD639070E553F1A2B93C7CD57488&steamid=%s", juego.getIdJuego(),user);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
@@ -140,7 +135,7 @@ public class JuegoActivity extends AppCompatActivity {
                                 new LogrosDesbloqueadosContextInstanceCreator(JuegoActivity.this));
                         Gson gson = gsonBuilder.create();
                         logrosDesbloqueados = gson.fromJson(response.toString(),LogrosDesbloqueados.class);
-                        logrosDesbloqueadosCargados = true;
+                        cargarLogros();
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -151,9 +146,6 @@ public class JuegoActivity extends AppCompatActivity {
         queue.add(jsonObjectRequest);
     }
 
-    public List<Achievement> getAchievements(){
-        return logrosDesbloqueados.getPlayerstats().getAchievements();
-    }
 
     private void cargarLogros() {
         String url = String.format("http://10.0.2.2/MINI_apijson/usuarios.php?accion=listarlogros&juego=%s", String.valueOf(juego.getIdJuego()));
