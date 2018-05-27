@@ -147,6 +147,13 @@ $conexion=Conectar($host,$user,$pass,$dbname);
            mysqli_query($conexion,$query) or die("ERROR");
            echo '{"estado":true}';
       break;
+	  
+	  case "eliminarcomentario":
+           $comentario=$_GET["comentario"];
+           $query="DELETE FROM comentario WHERE idComentario='$comentario';";
+           mysqli_query($conexion,$query) or die("ERROR");
+           echo '{"estado":true}';
+      break;
       
       case "actualizar":
            $user=$_GET["user"];
