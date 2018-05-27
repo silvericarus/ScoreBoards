@@ -17,16 +17,18 @@ import icarus.silver.scoreboards.JuegoActivity;
 import icarus.silver.scoreboards.R;
 import icarus.silver.scoreboards.models.Achievement;
 import icarus.silver.scoreboards.models.Logro;
+import icarus.silver.scoreboards.models.LogrosDesbloqueados;
 
 public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHolder> implements View.OnClickListener,View.OnLongClickListener {
     private ArrayList<Logro> itemList;
     private View.OnClickListener mListener;
     private View.OnLongClickListener mLongListener;
     private Context context;
+    LogroViewHolder viewHolder;
 
 
 
-    public LogroAdapter(ArrayList<Logro> itemList,Context context) {
+    public LogroAdapter(ArrayList<Logro> itemList, Context context) {
         this.itemList = itemList;
         this.context = context;
     }
@@ -54,7 +56,7 @@ public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHol
 
         view.setOnLongClickListener(mLongListener);
 
-        LogroViewHolder viewHolder = new LogroViewHolder(view,context);
+        viewHolder = new LogroViewHolder(view,context);
 
         return viewHolder;
     }
@@ -111,7 +113,7 @@ public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHol
         public void bindQuoteItem(Logro item) {
             int contador=0;
             try {
-                for (Achievement achievement : ((JuegoActivity) mContext).logrosDesbloqueados.getPlayerstats().getAchievements()) {
+                for (Achievement achievement : ((JuegoActivity)mContext).logrosDesbloqueados.getPlayerstats().getAchievements()) {
                     Log.d("logroDesbloqueado",achievement.getName());
                     if (item.getApiname().equals(achievement.getName())) {
                         Log.d("coincidencia",achievement.getName()+""+item.getApiname());
@@ -128,7 +130,10 @@ public class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHol
                     }
                 }
             }catch(NullPointerException ex){
-                    Picasso.with(item.getContext()).load(item.getImagengrey()).into(logo_logro);
+                Picasso.with(item.getContext()).load(item.getImagengrey()).into(logo_logro);
+                Log.w("BindWARN","WARN...Bindeo fallido "+ ex.getMessage());
+                ((JuegoActivity)mContext).getLogrosDesbloqueados();
+                ((JuegoActivity)mContext).logrosAdapter.notifyDataSetChanged();
             }
         }
     }
