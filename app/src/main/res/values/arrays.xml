@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="acciones_usuario">
+    <string-array name="acciones_usuario_avanzado">
         <item>Ver información</item>
         <item>Amonestar</item>
+        <item>Eliminar comentario</item>
+    </string-array>
+    <string-array name="acciones_usuario">
+        <item>Ver información</item>
     </string-array>
 </resources>

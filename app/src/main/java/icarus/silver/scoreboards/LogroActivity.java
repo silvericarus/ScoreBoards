@@ -199,29 +199,63 @@ public class LogroActivity extends AppCompatActivity{
 
     private void dialogousuario(final Comentario comentarioSelected) {
         AlertDialog.Builder builder = new AlertDialog.Builder(LogroActivity.this);
-        builder.setItems(R.array.acciones_usuario, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch(getResources().getStringArray(R.array.acciones_usuario)[which]){
-                    case "Ver información": info_usuario(comentarioSelected.getIdUsuario());
-                    dialog.dismiss();
-                    break;
+        if(usuario.getRol().equals("moderador")||usuario.getRol().equals("administrador")) {
+            builder.setItems(R.array.acciones_usuario_avanzado, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (getResources().getStringArray(R.array.acciones_usuario_avanzado)[which]) {
+                        case "Ver información":
+                            info_usuario(comentarioSelected.getIdUsuario());
+                            dialog.dismiss();
+                            break;
 
-                    case "Amonestar": amonestar(comentarioSelected);
-                    dialog.dismiss();
-                    break;
+                        case "Amonestar":
+                            amonestar(comentarioSelected);
+                            dialog.dismiss();
+                            break;
 
+                        case "Eliminar comentario":
+                            eliminarComentario(comentarioSelected);
+                            dialog.dismiss();
+                            break;
+
+                    }
                 }
-            }
-        }).setIcon(R.mipmap.logo_launcher)
-        .setPositiveButton("Cerrar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+            }).setIcon(R.mipmap.logo_launcher)
+                    .setPositiveButton("Cerrar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+        }else{
+            builder.setItems(R.array.acciones_usuario, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (getResources().getStringArray(R.array.acciones_usuario)[which]) {
+                        case "Ver información":
+                            info_usuario(comentarioSelected.getIdUsuario());
+                            dialog.dismiss();
+                            break;
+                    }
+                }
+            })
+                    .setIcon(R.mipmap.logo_launcher)
+                    .setPositiveButton("Cerrar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+        }
         Dialog alert = builder.create();
         alert.show();
+    }
+
+    private void eliminarComentario(Comentario comentarioSelected) {
+        comentarios.remove(comentarioSelected);
+        eliminarComentarioDB(comentarioSelected);
+        actualizarLista();
     }
 
     private void info_usuario(String usuarioComentarioSelected) {
@@ -236,32 +270,51 @@ public class LogroActivity extends AppCompatActivity{
         amonestarUsuario(comentarioSelected);
     }
     private void amonestarUsuario(Comentario comentarioSelected){
-        if(usuario.getRol().equals("moderador")||usuario.getRol().equals("administrador")){
-            String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=amonestar&user="+comentarioSelected.getIdUsuario();
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        if(response.get("estado").equals(true)){
-                            Toast.makeText(LogroActivity.this,"Usuario amonestado con éxito", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(LogroActivity.this,"Ha ocurrido un error al amonestar al usuario", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+        String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=amonestar&user="+comentarioSelected.getIdUsuario();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if(response.get("estado").equals(true)){
+                        Toast.makeText(LogroActivity.this,"Usuario amonestado con éxito", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(LogroActivity.this,"Ha ocurrido un error al amonestar al usuario", Toast.LENGTH_SHORT).show();
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("VolleyError",error.getMessage());
-                }
-            });
-            queue.add(jsonObjectRequest);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("VolleyError",error.getMessage());
+            }
+        });
+        queue.add(jsonObjectRequest);
+    }
 
-        }else{
-            Toast.makeText(LogroActivity.this,"No tienes permisos para hacer esto", Toast.LENGTH_SHORT).show();
-        }
+    private void eliminarComentarioDB(Comentario comentarioSelected){
+        String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=eliminarcomentario&comentario="+comentarioSelected.getIdComentario();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if(response.get("estado").equals(true)){
+                        Toast.makeText(LogroActivity.this,"Comentario eliminado con éxito", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(LogroActivity.this,"Ha ocurrido un error al eliminar el comentario", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("VolleyError",error.getMessage());
+            }
+        });
+        queue.add(jsonObjectRequest);
     }
     private void quitarExpDeAmonestar(Comentario comentario){
         if(comentario.getVecesAmonestado()==0){
