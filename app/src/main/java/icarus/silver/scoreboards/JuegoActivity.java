@@ -2,7 +2,6 @@ package icarus.silver.scoreboards;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -32,17 +31,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import icarus.silver.scoreboards.adapters.LogroAdapter;
-import icarus.silver.scoreboards.models.Achievement;
 import icarus.silver.scoreboards.models.Juego;
 import icarus.silver.scoreboards.models.Logro;
 import icarus.silver.scoreboards.models.LogroContextInstanceCreator;
 import icarus.silver.scoreboards.models.LogrosDesbloqueados;
 import icarus.silver.scoreboards.models.LogrosDesbloqueadosContextInstanceCreator;
-import icarus.silver.scoreboards.models.UserContextInstanceCreator;
-import icarus.silver.scoreboards.models.Usuario;
 
 import static java.lang.Thread.sleep;
 
@@ -89,9 +84,9 @@ public class JuegoActivity extends AppCompatActivity {
         logros_rv.setAdapter(logrosAdapter);
         logros_rv.setLayoutManager(new GridLayoutManager(this,3));
 
-        logrosAdapter.setOnClickListener(new View.OnClickListener() {
+        logrosAdapter.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 final Logro logroSelected = logrosAdapter.getItemList().get(logros_rv.getChildAdapterPosition(v));
                 ToolTip toolTip = new ToolTip.Builder()
                         .withText(logroSelected.getNombre())
@@ -105,19 +100,19 @@ public class JuegoActivity extends AppCompatActivity {
                         .withGravity(Gravity.TOP)
                         .build();
                 toolTipView.show();
+                return true;
             }
         });
 
-        logrosAdapter.setOnLongClickListener(new View.OnLongClickListener() {
+        logrosAdapter.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
+            public void onClick(View v) {
                 final Logro logroSelected = logrosAdapter.getItemList().get(logros_rv.getChildAdapterPosition(v));
 
                 Intent intent1 = new Intent(JuegoActivity.this,LogroActivity.class);
                 intent1.putExtra("logro",logroSelected);
                 intent1.putExtra("user",user);
                 startActivity(intent1);
-                return false;
             }
         });
 
