@@ -60,8 +60,6 @@ public class LoginActivity extends AppCompatActivity {
                                     Usuario usuariologeado = gson.fromJson(response.getJSONObject(0).toString(),Usuario.class);
                                     Log.i("usuario", String.valueOf(usuariologeado.getIdUsuario()));
                                     user = usuariologeado.getIdUsuario();
-                                    queue.stop();
-
                                     Intent intent = new Intent(LoginActivity.this,UsuarioActivity.class);
                                     intent.putExtra("user",user);
                                     startActivity(intent);
@@ -82,5 +80,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        queue.stop();
     }
 }

@@ -93,6 +93,10 @@ public class UsuarioActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Método que se trae el usuario actual haciendo una petición a la BD.
+     * @param user el ID de usuario.
+     */
     public void traerUsuario(long user){
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=selectuser&user="+user;
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
@@ -126,6 +130,14 @@ public class UsuarioActivity extends AppCompatActivity {
         queue.add(jsonArrayRequest);
     }
 
+    /**
+     * Método que se encarga de rellenar de información la tarjeta de usuario en la interfaz.
+     * @param nick TextView que representa el nick del usuario
+     * @param descripcion TextView que representa la descripción del usuario
+     * @param nivel TextView que representa el nivel del usuario
+     * @param userimage ImageView que representa la imagen del usuario
+     * @param logoUsuario ImageView que representa el rol del usuario
+     */
     public void rellenarUsuario(TextView nick,TextView descripcion,TextView nivel,ImageView userimage,ImageView logoUsuario){
         nick.setText(usuarioActual.getNick());
         Log.i("nick",""+usuarioActual.getNick());
@@ -148,6 +160,9 @@ public class UsuarioActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Este método rellena los juegos, haciendo una petición a la BD que se trae los juegos que tiene el usuario actual
+     */
     public void rellenarJuegos(){
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=selectjuegoscompradospor&user="+user;
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
@@ -189,5 +204,11 @@ public class UsuarioActivity extends AppCompatActivity {
                     }
                 });
         queue.add(jsonArrayRequest);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        queue.stop();
     }
 }

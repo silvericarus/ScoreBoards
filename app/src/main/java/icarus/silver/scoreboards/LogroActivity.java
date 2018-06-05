@@ -36,6 +36,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.PrintStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 
 import icarus.silver.scoreboards.adapters.ComentarioAdapter;
@@ -113,6 +116,11 @@ public class LogroActivity extends AppCompatActivity{
 
     }
 
+    /**
+     * Se crea el menú y se infla en la vista.
+     * @param menu el objeto menú
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -120,6 +128,11 @@ public class LogroActivity extends AppCompatActivity{
         return true;
     }
 
+    /**
+     * Aquí se maneja las opciones del menú superior.
+     * @param item el ítem seleccionado
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -132,6 +145,9 @@ public class LogroActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Método que crea un comentario, se encarga de llamar al diálogo y hacer la petición posterio.
+     */
     private void crearComentario() {
         AlertDialog.Builder builder = new AlertDialog.Builder(LogroActivity.this);
 
@@ -169,10 +185,14 @@ public class LogroActivity extends AppCompatActivity{
         alert.show();
     }
 
+    /**
+     * Método que hace una petición a la BD para crear un comentario.
+     * @param contenido_coment el contenido del comentario
+     * @param user el ID del usuario que lo comenta
+     * @param idLogro el ID del logro en el que lo ha comentado
+     */
     private void llamarApiCrearComentario(String contenido_coment, long user, int idLogro) {
-        Log.i("contenidodespues",contenido_coment);
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=crearcomentario&user="+user+"&logro="+idLogro+"&contenido="+contenido_coment;
-        Log.i("apiComentario",url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -197,6 +217,10 @@ public class LogroActivity extends AppCompatActivity{
         queue.add(jsonObjectRequest);
     }
 
+    /**
+     * Método que crea un diálogo al pulsar sobre la imagen del usuario de cada comentario.
+     * @param comentarioSelected el comentario sobre el que se ha actuado
+     */
     private void dialogousuario(final Comentario comentarioSelected) {
         AlertDialog.Builder builder = new AlertDialog.Builder(LogroActivity.this);
         if(usuario.getRol().equals("moderador")||usuario.getRol().equals("administrador")) {
@@ -222,6 +246,7 @@ public class LogroActivity extends AppCompatActivity{
                     }
                 }
             }).setIcon(R.mipmap.logo_launcher)
+                    .setTitle("Interacciones de comentario")
                     .setPositiveButton("Cerrar", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -241,6 +266,7 @@ public class LogroActivity extends AppCompatActivity{
                 }
             })
                     .setIcon(R.mipmap.logo_launcher)
+                    .setTitle("Interacciones de comentario")
                     .setPositiveButton("Cerrar", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -252,12 +278,20 @@ public class LogroActivity extends AppCompatActivity{
         alert.show();
     }
 
+    /**
+     * Método que elimina un comentario, tanto de la BD como del recyclerview.
+     * @param comentarioSelected el comentario a eliminar
+     */
     private void eliminarComentario(Comentario comentarioSelected) {
         comentarios.remove(comentarioSelected);
         eliminarComentarioDB(comentarioSelected);
         actualizarLista();
     }
 
+    /**
+     * Método que abre la Actividad de usuario en modo información, para mostrar sólo los datos útiles al usuario.
+     * @param usuarioComentarioSelected el ID del usuario
+     */
     private void info_usuario(String usuarioComentarioSelected) {
         Intent intent = new Intent(LogroActivity.this,UsuarioActivity.class);
         intent.putExtra("user",Long.valueOf(usuarioComentarioSelected));
@@ -265,10 +299,19 @@ public class LogroActivity extends AppCompatActivity{
         startActivity(intent);
     }
 
+    /**
+     * Método que amonesta a un usuario al pulsar en el menú de interacciones del comentario.
+     * @param comentarioSelected comentario sobre el que se actúa.
+     */
     private void amonestar(Comentario comentarioSelected) {
         quitarExpDeAmonestar(comentarioSelected);
         amonestarUsuario(comentarioSelected);
     }
+
+    /**
+     * Petición a la BD para que amoneste a un usuario.
+     * @param comentarioSelected el comentario sobre el que se hace la petición
+     */
     private void amonestarUsuario(Comentario comentarioSelected){
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=amonestar&user="+comentarioSelected.getIdUsuario();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
@@ -293,6 +336,10 @@ public class LogroActivity extends AppCompatActivity{
         queue.add(jsonObjectRequest);
     }
 
+    /**
+     * Petición a la BD para que elimine un comentario.
+     * @param comentarioSelected el comentario sobre el que se hace la petición
+     */
     private void eliminarComentarioDB(Comentario comentarioSelected){
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=eliminarcomentario&comentario="+comentarioSelected.getIdComentario();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
@@ -316,6 +363,11 @@ public class LogroActivity extends AppCompatActivity{
         });
         queue.add(jsonObjectRequest);
     }
+
+    /**
+     * Método especial para el caso de quitar EXP en amonestación.
+     * @param comentario el comentario sobre el que se actúa
+     */
     private void quitarExpDeAmonestar(Comentario comentario){
         if(comentario.getVecesAmonestado()==0){
             quitarExp(comentario.getIdUsuario(),15);
@@ -325,7 +377,11 @@ public class LogroActivity extends AppCompatActivity{
             quitarExp(comentario.getIdUsuario(),35);
         }
     }
-
+    /**
+     * Este método hace la lógica tras quitar experiencia a un usuario.
+     * @param idUsuario el ID del usuario.
+     * @param exp la cantidad de EXP a quitar.
+     */
     private void quitarExp(final String idUsuario, final int exp) {
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=quitarexp&user="+idUsuario+"&exp="+exp;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
@@ -349,7 +405,11 @@ public class LogroActivity extends AppCompatActivity{
         });
         queue.add(jsonObjectRequest);
     }
-
+    /**
+     * Este método hace la lógica tras un voto positivo.
+     * @param v la vista que ha llamado al método
+     * @param comentario el comentario sobre el que se ha hecho el voto
+     */
     private void upvote(View v,Comentario comentario) {
         if(comentario.getIdUsuario().equals(String.valueOf(user))){
             Toast.makeText(LogroActivity.this,"No puedes votar tus mismos comentarios",Toast.LENGTH_SHORT).show();
@@ -368,7 +428,10 @@ public class LogroActivity extends AppCompatActivity{
             actualizarLista();
         }
     }
-
+    /**
+     * Esta función hace la llamada a la BD para actualizar un voto positivo.
+     * @param comentario el comentario sobre el que se hizo el voto positivo.
+     */
     private void upvoteDB(Comentario comentario) {
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=upvote&comentario="+comentario.getIdComentario()+"&usuario="+comentario.getIdUsuario();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
@@ -393,6 +456,10 @@ public class LogroActivity extends AppCompatActivity{
         queue.add(jsonObjectRequest);
     }
 
+    /**
+     * Esta función hace la llamada a la BD para actualizar un voto negativo.
+     * @param comentario el comentario sobre el que se hizo el voto negativo.
+     */
     private void downvoteDB(Comentario comentario) {
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=downvote&comentario="+comentario.getIdComentario()+"&usuario="+comentario.getIdUsuario();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
@@ -417,6 +484,11 @@ public class LogroActivity extends AppCompatActivity{
         queue.add(jsonObjectRequest);
     }
 
+    /**
+     * Esta función hace la lógica tras dar experiencia a un usuario.
+     * @param idUsuario el ID del usuario.
+     * @param exp la cantidad de EXP a dar.
+     */
     private void darExp(final String idUsuario, final int exp){
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=darexp&user="+idUsuario+"&exp="+exp;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null , new Response.Listener<JSONObject>() {
@@ -441,6 +513,10 @@ public class LogroActivity extends AppCompatActivity{
         queue.add(jsonObjectRequest);
     }
 
+    /**
+     * Este método trae el usuario actual logueado en la aplicación.
+     * @param user el ID del usuario
+     */
     public void traerUsuario(long user){
         String url = "http://10.0.2.2/MINI_apijson/usuarios.php?accion=selectuser&user="+user;
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
@@ -473,6 +549,11 @@ public class LogroActivity extends AppCompatActivity{
         queue.add(jsonArrayRequest);
     }
 
+    /**
+     * Este método hace la lógica tras un voto negativo.
+     * @param v la vista que ha llamado al método
+     * @param comentario el comentario sobre el que se ha hecho el voto
+     */
     private void downvote(View v,Comentario comentario) {
         if(comentario.getIdUsuario().equals(String.valueOf(user))){
             Toast.makeText(LogroActivity.this,"No puedes votar tus mismos comentarios",Toast.LENGTH_SHORT).show();
@@ -496,6 +577,9 @@ public class LogroActivity extends AppCompatActivity{
         comentarioAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Este método llama a la petición que trae los comentarios actuales en la base de datos
+     */
     private void traerComentarios() {
         if(comentarios.size() > 0){
             comentarios.clear();
@@ -511,6 +595,7 @@ public class LogroActivity extends AppCompatActivity{
                         gsonBuilder.registerTypeAdapter(
                                 Comentario.class,
                                 new ComentarioContextInstanceCreator(LogroActivity.this));
+                        gsonBuilder.disableHtmlEscaping(); //Intento de arreglar el bug de UTF-8
                         Gson gson = gsonBuilder.create();
                         try {
                             ArrayList<String> listdata = new ArrayList<String>();
@@ -541,4 +626,9 @@ public class LogroActivity extends AppCompatActivity{
         queue.add(jsonArrayRequest);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        queue.stop();
+    }
 }

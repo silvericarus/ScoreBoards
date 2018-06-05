@@ -5,7 +5,7 @@ function Conectar($host,$user,$pass,$dbname)
 {
 	
    $conexion=mysqli_connect($host,$user,$pass) or die("ERROR CONEXION");
-   mysqli_set_charset($conexion,'utf-8');
+   mysqli_set_charset($conexion,'utf8');
    mysqli_select_db($conexion,$dbname) or die("ERROR CONEXION");
    return $conexion;
 }

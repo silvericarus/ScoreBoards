@@ -118,6 +118,9 @@ public class JuegoActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Hace una petición a la API de Steam para traer los logros desbloqueados por el usuario actual
+     */
     public void getLogrosDesbloqueados() {
         String url = String.format("https://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=%s&key=2A6FAD639070E553F1A2B93C7CD57488&steamid=%s", juego.getIdJuego(),user);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -141,7 +144,9 @@ public class JuegoActivity extends AppCompatActivity {
         queue.add(jsonObjectRequest);
     }
 
-
+    /**
+     * Hace una petición a la BD para traer los logros del juego actual.
+     */
     private void cargarLogros() {
         String url = String.format("http://10.0.2.2/MINI_apijson/usuarios.php?accion=listarlogros&juego=%s", String.valueOf(juego.getIdJuego()));
         Log.i("peticion",url);
@@ -188,5 +193,11 @@ public class JuegoActivity extends AppCompatActivity {
                     }
                 });
         queue.add(jsonArrayRequest);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        queue.stop();
     }
 }
